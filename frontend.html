@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User CRUD App</title>
+</head>
+<body>
+    <h1>CRUD App</h1>
+
+    <div id = "CreateUser">
+        <h2>Create User</h2>
+        <div id = "PersonalInfo">
+            <h3>Personal Information</h3>
+            <input type="text" id="title" placeholder="Title">
+            <input type="text" id="firstName" placeholder="First Name">
+            <input type="text" id="lastName" placeholder="Surname">
+            <input type="text" id="mobile" placeholder="Mobile">
+            <input type="email" id="email" placeholder="Email">
+        </div>
+
+        <div id = "billingAddress">
+            <h4>Billing Address</h4>
+            <input type="text" id="billingAddressLine1" placeholder="Address Line 1">
+            <input type="text" id="billingAddressLine2" placeholder="Address Line 2">
+            <input type="text" id="billingTown" placeholder="Town">
+            <input type="text" id="billingCounty" placeholder="County">
+            <input type="text" id="billingEircode" placeholder="Eircode">
+        </div>
+
+        <input type = "checkbox" id="differentShippingAddress" name = "differentShippingAddress">
+        <label for="differentShippingAddress" >Shipping Address is different from billing address</label>
+
+        <div id = "shippingAddress" style = "display: none;">
+            <input type="text" id="shippingAddressLine1" placeholder="Address Line 1">
+            <input type="text" id="shippingAddressLine2" placeholder="Address Line 2">
+            <input type="text" id="shippingTown" placeholder="Town">
+            <input type="text" id="shippingCounty" placeholder="County">
+            <input type="text" id="shippingEircode" placeholder="Eircode">
+        </div>
+
+        <button id = "createButton">Create User</button>
+    </div>
+
+    <div id = "searchUsers">
+        <h4>Search Users</h4>
+        <input type = "text" id = "searchName" placeholder="Search">
+        <button id = "searchButton">Search</button>
+        <div id = "SearchResults"></div>
+    </div>
+
+    <script src = "https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            const apiUrl = "http://localhost:3500";
+
+            $('#differentShippingAddress').change(function(){
+                if(this.checked){
+                    $('#shippingAddress').show();
+                }else{
+                    $('#shippingAddress').hide();
+                }
+            });
+
+            $('#createButton').click(function(){
+                const title = $('#title').val();
+                const firstName = $('#firstName').val();
+                const lastName = $('#lastName').val();
+                const mobile = $('#mobile').val();
+                const email = $('#email').val();
+
+                const billingAddressLine1 = $('#billingAddressLine1').val();
+                const billingAddressLine2 = $('#billingAddressLine2').val();
+                const billingTown = $('#billingTown').val();
+                const billingCounty = $('#billingCounty').val();
+                const billingEircode = $('#billingEircode').val();
+                const billing_address_type = "home";
+
+                const differentShippingAddress = $('#differentShippingAddress').is(':checked');
+                const shippingAddressLine1 = differentShippingAddress ? $('#shippingAddressLine1').val() : billingAddressLine1;
+                const shippingAddressLine2 = differentShippingAddress ? $('#shippingAddressLine2').val() : billingAddressLine2;
+                const shippingTown = differentShippingAddress ? $('#shippingTown').val() : billingTown;
+                const shippingCounty = differentShippingAddress ? $('#shippingCounty').val() : billingCounty;
+                const shippingEircode = differentShippingAddress ? $('#shippingEircode').val() : billingEircode;
+                const shipping_address_type = "shipping";
+
+                $.get(`${apiUrl}/create-user?title=${title}&firstName=${firstName}&lastName=${lastName}&phoneNumber=${mobile}&email=${email}&billingAddressLine1=${billingAddressLine1}&billingAddressLine2=${billingAddressLine2}&billingTown=${billingTown}&billingCounty=${billingCounty}&billingEircode=${billingEircode}&billing_address_type=${billing_address_type}&shippingAddressLine1=${shippingAddressLine1}&shippingAddressLine2=${shippingAddressLine2}&shippingTown=${shippingTown}&shippingCounty=${shippingCounty}&shippingEircode=${shippingEircode}&shipping_address_type=${shipping_address_type}`);
+                alert("User Created");
+            });
+
+        $('#searchButton').click(function(){
+        const searchName = $('#searchName').val();
+        
+
+            $.get(`${apiUrl}/search-users?name=${searchName}`, function(data){
+                $('#SearchResults').html('');
+
+                if(data && data.length > 0){
+                data.forEach(function(user){
+                    console.log("Working");
+                    $('#SearchResults').append(`<div>${user.title}-${user.firstName}-${user.lastName}-${user.phoneNumber}-${user.email}</div>`);
+                });
+                } else {
+                    
+                    console.log("Test");
+                $('#SearchResults').html('No users found');
+                }
+            });
+            });
+
+        });
+
+    </script>
+</body>
+</html>
